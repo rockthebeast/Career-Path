@@ -1,0 +1,127 @@
+{
+  "common": {
+    "explore": "खोजें",
+    "login": "लॉगिन",
+    "register": "रजिस्टर",
+    "logout": "लॉगआउट",
+    "favorites": "पसंदीदा",
+    "myFavorites": "मेरे पसंदीदा",
+    "favoriteCareers": "पसंदीदा करियर",
+    "favoriteCourses": "पसंदीदा कोर्स",
+    "learnMore": "और जानें",
+    "loading": "लोड हो रहा है...",
+    "pleaseWait": "कृपया प्रतीक्षा करें..."
+  },
+  "auth": {
+    "welcomeBack": "वापसी पर स्वागत है!",
+    "createAccount": "खाता बनाएं",
+    "loginDescription": "अपना करियर पथ खोजने के लिए लॉगिन करें",
+    "signupDescription": "अपना सही करियर खोजने के लिए जुड़ें",
+    "otpDescription": "हम आपके ईमेल पर एक वन-टाइम कोड भेजेंगे",
+    "fullName": "पूरा नाम",
+    "enterName": "अपना नाम दर्ज करें",
+    "emailOrMobile": "ईमेल पता",
+    "emailAddress": "ईमेल पता",
+    "enterEmail": "अपना ईमेल दर्ज करें",
+    "password": "पासवर्ड",
+    "enterPassword": "अपना पासवर्ड दर्ज करें",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "confirmYourPassword": "अपने पासवर्ड की पुष्टि करें",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "rememberMe": "मुझे याद रखें",
+    "login": "लॉगिन",
+    "signUp": "साइन अप",
+    "or": "या",
+    "continueWithGoogle": "Google से जारी रखें",
+    "loginWithOTP": "ईमेल OTP से लॉगिन",
+    "loginWithPassword": "पासवर्ड से लॉगिन",
+    "sendOtp": "OTP भेजें",
+    "enterOtp": "OTP कोड दर्ज करें",
+    "otpSentMessage": "एक 6-अंकीय कोड भेजा गया है",
+    "verifying": "सत्यापित हो रहा है...",
+    "verifyAndLogin": "सत्यापित करें और लॉगिन करें",
+    "resendOtp": "OTP पुनः भेजें",
+    "continueAsGuest": "अतिथि के रूप में जारी रखें",
+    "noAccount": "खाता नहीं है? ",
+    "haveAccount": "पहले से खाता है? ",
+    "trustMessage": "आपका डेटा हमारे साथ सुरक्षित है। हम आपकी जानकारी कभी साझा नहीं करते।",
+    "allRightsReserved": "सर्वाधिकार सुरक्षित।"
+  },
+  "nav": {
+    "home": "होम",
+    "careers": "करियर",
+    "colleges": "कॉलेज",
+    "explore": "अन्वेषण",
+    "govtJobs": "सरकारी नौकरी",
+    "scholarships": "छात्रवृत्ति",
+    "freeCourses": "मुफ्त कोर्स",
+    "careerQuiz": "करियर क्विज़",
+    "mentalHealth": "सहायता",
+    "parentDashboard": "अभिभावकों के लिए"
+  },
+  "hero": {
+    "badge": "सभी छात्रों के लिए मुफ्त करियर मार्गदर्शन",
+    "title": "आपकी करियर यात्रा",
+    "titleHighlight": "यहीं से शुरू होती है",
+    "description": "करियर पथ, सरकारी नौकरियां, छात्रवृत्ति और मुफ्त शिक्षण संसाधन खोजें। ग्रामीण भारत के छात्रों और प्रथम पीढ़ी के शिक्षार्थियों के लिए बनाया गया।",
+    "findCareerPath": "अपना करियर पथ खोजें",
+    "exploreAllCareers": "सभी करियर देखें"
+  },
+  "paths": {
+    "title": "अपना रास्ता चुनें",
+    "subtitle": "उपयुक्त करियर विकल्पों का पता लगाने के लिए अपना शिक्षा स्तर चुनें",
+    "after10th": {
+      "title": "10वीं के बाद",
+      "description": "डिप्लोमा कोर्स, ITI, पॉलिटेक्निक और अधिक"
+    },
+    "after12thScience": {
+      "title": "12वीं साइंस के बाद",
+      "description": "इंजीनियरिंग, मेडिकल, रिसर्च करियर"
+    },
+    "after12thCommerce": {
+      "title": "12वीं कॉमर्स के बाद",
+      "description": "CA, बैंकिंग, व्यापार और वित्त करियर"
+    },
+    "after12thArts": {
+      "title": "12वीं आर्ट्स के बाद",
+      "description": "कानून, सिविल सेवाएं, क्रिएटिव करियर"
+    }
+  },
+  "features": {
+    "title": "आपको जो कुछ भी चाहिए",
+    "subtitle": "आपकी उंगलियों पर पूर्ण करियर मार्गदर्शन",
+    "careerGuidance": {
+      "title": "करियर मार्गदर्शन",
+      "description": "ऐसे करियर खोजें जो आपकी रुचियों और कौशल से मेल खाते हों"
+    },
+    "governmentJobs": {
+      "title": "सरकारी नौकरियां",
+      "description": "SSC, बैंकिंग, रेलवे, रक्षा और अधिक"
+    },
+    "scholarships": {
+      "title": "छात्रवृत्ति",
+      "description": "अपनी शिक्षा के लिए छात्रवृत्ति खोजें"
+    },
+    "freeCourses": {
+      "title": "मुफ्त कोर्स",
+      "description": "SWAYAM, NPTEL और अधिक से सीखें"
+    }
+  },
+  "stats": {
+    "careersListed": "करियर सूचीबद्ध",
+    "govtJobCategories": "सरकारी नौकरी श्रेणियां",
+    "scholarships": "छात्रवृत्ति",
+    "freeCourses": "मुफ्त कोर्स"
+  },
+  "cta": {
+    "title": "सुनिश्चित नहीं कि कौन सा करियर आपके लिए सही है?",
+    "description": "अपनी रुचियों और ताकत के आधार पर हमारी सरल क्विज़ लें। हम आपके लिए सर्वोत्तम करियर पथ की सिफारिश करेंगे!",
+    "button": "करियर क्विज़ लें"
+  },
+  "language": {
+    "selectLanguage": "भाषा चुनें",
+    "english": "English",
+    "hindi": "हिंदी",
+    "kannada": "ಕನ್ನಡ"
+  }
+}

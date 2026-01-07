@@ -1,0 +1,126 @@
+{
+  "auth": {
+    "welcomeBack": "Welcome Back!",
+    "createAccount": "Create Account",
+    "loginDescription": "Login to explore your career path",
+    "signupDescription": "Join us to discover your perfect career",
+    "otpDescription": "We will send a one-time code to your email",
+    "fullName": "Full Name",
+    "enterName": "Enter your name",
+    "emailOrMobile": "Email Address",
+    "emailAddress": "Email Address",
+    "enterEmail": "Enter your email",
+    "password": "Password",
+    "enterPassword": "Enter your password",
+    "confirmPassword": "Confirm Password",
+    "confirmYourPassword": "Confirm your password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember me",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "or": "OR",
+    "continueWithGoogle": "Continue with Google",
+    "loginWithOTP": "Login with Email OTP",
+    "loginWithPassword": "Login with Password",
+    "sendOtp": "Send OTP",
+    "enterOtp": "Enter OTP Code",
+    "otpSentMessage": "A 6-digit code has been sent to",
+    "verifying": "Verifying...",
+    "verifyAndLogin": "Verify & Login",
+    "resendOtp": "Resend OTP",
+    "noAccount": "Don't have an account? ",
+    "haveAccount": "Already have an account? ",
+    "trustMessage": "Your data is safe with us. We never share your information.",
+    "allRightsReserved": "All rights reserved."
+  },
+  "common": {
+    "explore": "Explore",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "favorites": "Favorites",
+    "myFavorites": "My Favorites",
+    "favoriteCareers": "Favorite Careers",
+    "favoriteCourses": "Favorite Courses",
+    "learnMore": "Learn More",
+    "loading": "Loading...",
+    "pleaseWait": "Please wait..."
+  },
+  "nav": {
+    "home": "Home",
+    "careers": "Careers",
+    "colleges": "Colleges",
+    "explore": "Explore",
+    "govtJobs": "Govt Jobs",
+    "scholarships": "Scholarships",
+    "freeCourses": "Free Courses",
+    "careerQuiz": "Career Quiz",
+    "mentalHealth": "Support",
+    "parentDashboard": "For Parents"
+  },
+  "hero": {
+    "badge": "Free Career Guidance for All Students",
+    "title": "Your Career Journey",
+    "titleHighlight": "Starts Here",
+    "description": "Discover career paths, government jobs, scholarships, and free learning resources. Made for students from rural India and first-generation learners.",
+    "findCareerPath": "Find Your Career Path",
+    "exploreAllCareers": "Explore All Careers"
+  },
+  "paths": {
+    "title": "Choose Your Path",
+    "subtitle": "Select your education level to explore suitable career options",
+    "after10th": {
+      "title": "After 10th Standard",
+      "description": "Explore diploma courses, ITI, polytechnic & more"
+    },
+    "after12thScience": {
+      "title": "After 12th Science",
+      "description": "Engineering, Medical, Research careers"
+    },
+    "after12thCommerce": {
+      "title": "After 12th Commerce",
+      "description": "CA, Banking, Business & Finance careers"
+    },
+    "after12thArts": {
+      "title": "After 12th Arts",
+      "description": "Law, Civil Services, Creative careers"
+    }
+  },
+  "features": {
+    "title": "Everything You Need",
+    "subtitle": "Complete career guidance at your fingertips",
+    "careerGuidance": {
+      "title": "Career Guidance",
+      "description": "Discover careers that match your interests and skills"
+    },
+    "governmentJobs": {
+      "title": "Government Jobs",
+      "description": "SSC, Banking, Railways, Defence & more"
+    },
+    "scholarships": {
+      "title": "Scholarships",
+      "description": "Find scholarships for your education"
+    },
+    "freeCourses": {
+      "title": "Free Courses",
+      "description": "Learn from SWAYAM, NPTEL & more"
+    }
+  },
+  "stats": {
+    "careersListed": "Careers Listed",
+    "govtJobCategories": "Govt Job Categories",
+    "scholarships": "Scholarships",
+    "freeCourses": "Free Courses"
+  },
+  "cta": {
+    "title": "Not Sure Which Career is Right for You?",
+    "description": "Take our simple quiz based on your interests and strengths. We'll recommend the best career paths for you!",
+    "button": "Take Career Quiz"
+  },
+  "language": {
+    "selectLanguage": "Select Language",
+    "english": "English",
+    "hindi": "हिंदी",
+    "kannada": "ಕನ್ನಡ"
+  }
+}
