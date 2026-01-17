@@ -4,6 +4,7 @@ import { ArrowRight, ArrowLeft, CheckCircle2, RotateCcw, Sparkles } from "lucide
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import BackButton from "@/components/BackButton";
 
 interface Question {
   id: number;
@@ -179,6 +180,10 @@ export default function CareerQuizPage() {
     return (
       <Layout>
         <div className="container py-8 md:py-12 max-w-3xl">
+          {/* Back to Home */}
+          <div className="mb-4">
+            <BackButton label="Back to Home" />
+          </div>
           <Card variant="gradient" className="text-center animate-scale-in">
             <CardHeader>
               <div className="w-16 h-16 mx-auto rounded-full bg-success/20 flex items-center justify-center mb-4">
@@ -240,6 +245,10 @@ export default function CareerQuizPage() {
   return (
     <Layout>
       <div className="container py-8 md:py-12 max-w-2xl">
+        {/* Back to Home */}
+        <div className="mb-4">
+          <BackButton label="Back to Home" />
+        </div>
         {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between text-sm text-muted-foreground mb-2">

@@ -16,13 +16,117 @@ import {
   BookOpen,
   Award,
 } from "lucide-react";
-import { collegesData, formatFees } from "@/data/collegesData";
+import { collegesData, formatFees, College } from "@/data/collegesData";
+
+// Famous colleges from Dakshina Kannada district (Same data as Finder for consistency)
+const dakshinaKannadaColleges: College[] = [
+  {
+    id: "st-aloysius-puc-mangalore",
+    name: "St. Aloysius Pre-University College",
+    city: "Mangalore",
+    state: "karnataka",
+    district: "dakshina-kannada",
+    type: "private",
+    courses: ["science", "commerce", "arts"],
+    totalFees: 45000,
+    annualFees: 22000,
+    established: "1880",
+    website: "https://staloysiuspuc.in",
+    affiliation: "Karnataka PU Board",
+    accreditation: "A+",
+    facilities: ["Labs", "Library", "Sports Complex", "Auditorium", "Hostel"],
+    class10CutOff: { percentage: 85, board: "state" }
+  },
+  {
+    id: "expert-pu-college-mangalore",
+    name: "Expert Pre-University College",
+    city: "Mangalore",
+    state: "karnataka",
+    district: "dakshina-kannada",
+    type: "private",
+    courses: ["science"],
+    totalFees: 180000,
+    annualFees: 90000,
+    established: "1986",
+    website: "https://www.expertclasses.org",
+    affiliation: "Karnataka PU Board",
+    facilities: ["AC Classrooms", "Hostel", "Transport", "Study Halls"],
+    class10CutOff: { percentage: 88, board: "state" }
+  },
+  {
+    id: "nitk-surathkal",
+    name: "National Institute of Technology Karnataka (NITK)",
+    city: "Surathkal",
+    state: "karnataka",
+    district: "dakshina-kannada",
+    type: "government",
+    courses: ["engineering", "science", "phd"],
+    totalFees: 600000,
+    annualFees: 150000,
+    established: "1960",
+    website: "https://www.nitk.ac.in",
+    affiliation: "Autonomous",
+    accreditation: "NBA",
+    facilities: ["Hostel", "Beach Access", "Central Library", "Sports Complex", "Labs"],
+    pucCutOff: { percentage: 98, stream: "science", subjects: "PCM" }
+  },
+  {
+    id: "kmc-mangalore",
+    name: "Kasturba Medical College (KMC)",
+    city: "Mangalore",
+    state: "karnataka",
+    district: "dakshina-kannada",
+    type: "private",
+    courses: ["medical", "science"],
+    totalFees: 6500000,
+    annualFees: 1400000,
+    established: "1953",
+    website: "https://manipal.edu/kmc-mangalore.html",
+    affiliation: "Manipal Academy of Higher Education",
+    accreditation: "NAAC A++",
+    facilities: ["Hospital", "Labs", "Library", "Hostel", "Sports"],
+    pucCutOff: { percentage: 90, stream: "science", subjects: "PCB" }
+  },
+  {
+    id: "canara-college-mangalore",
+    name: "Canara College",
+    city: "Mangalore",
+    state: "karnataka",
+    district: "dakshina-kannada",
+    type: "private",
+    courses: ["science", "commerce", "arts", "bca", "bba"],
+    totalFees: 75000,
+    annualFees: 25000,
+    established: "1973",
+    website: "https://www.canaracollege.com",
+    affiliation: "Mangalore University",
+    accreditation: "A",
+    facilities: ["Library", "Labs", "Seminar Hall", "Canteen"],
+    pucCutOff: { percentage: 60, stream: "any" }
+  },
+  {
+    id: "govt-polytechnic-mangalore",
+    name: "Government Polytechnic",
+    city: "Mangalore",
+    state: "karnataka",
+    district: "dakshina-kannada",
+    type: "government",
+    courses: ["diploma"],
+    totalFees: 15000,
+    annualFees: 5000,
+    established: "1950",
+    website: "https://gpt.karnataka.gov.in/gptmangalore",
+    affiliation: "DTE Karnataka",
+    facilities: ["Labs", "Workshop", "Library"],
+    class10CutOff: { percentage: 45, board: "state" }
+  }
+];
 
 const CollegeDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const college = collegesData.find((c) => c.id === id);
+  const college = [...collegesData, ...dakshinaKannadaColleges].find((c) => c.id === id);
 
   if (!college) {
     return (

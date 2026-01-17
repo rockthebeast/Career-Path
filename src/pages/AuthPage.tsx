@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { 
@@ -9,7 +9,6 @@ import {
   User, 
   Mail, 
   Lock, 
-  Phone,
   Loader2,
   ArrowRight,
   Sparkles
@@ -42,15 +41,11 @@ const registerSchema = z.object({
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isOtpMode, setIsOtpMode] = useState(false);
-  const [isOtpSent, setIsOtpSent] = useState(false);
-  const [isOtpLoading, setIsOtpLoading] = useState(false);
-  const [otpEmail, setOtpEmail] = useState("");
-  const [otpToken, setOtpToken] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation();
@@ -64,6 +59,7 @@ export default function AuthPage() {
 
   const { user, signUp, signIn, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -71,6 +67,17 @@ export default function AuthPage() {
       navigate("/dashboard");
     }
   }, [user, loading, navigate]);
+
+  // Surface OAuth error from callback if present
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const err = params.get('error');
+    if (err) {
+      setErrors({ general: err });
+      // Clean the URL
+      navigate('/', { replace: true });
+    }
+  }, [location.search, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -117,6 +124,14 @@ export default function AuthPage() {
         if (error) {
           setErrors({ general: error.message });
         } else {
+          // Record login history
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && user.email) {
+            await supabase.from('user_logins').insert({
+              user_id: user.id,
+              email: user.email,
+            });
+          }
           navigate("/dashboard");
         }
       } else {
@@ -132,108 +147,39 @@ export default function AuthPage() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+
+    if (!formData.email || !z.string().email().safeParse(formData.email).success) {
+      setErrors({ email: "Please enter a valid email address" });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+        redirectTo: `${window.location.origin}/settings`,
+      });
+
+      if (error) {
+        setErrors({ general: error.message });
+      } else {
+        setResetEmailSent(true);
+      }
+    } catch (err) {
+      setErrors({ general: "An error occurred. Please try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const switchMode = () => {
     setIsLogin(!isLogin);
-    setIsOtpMode(false);
-    setIsOtpSent(false);
-    setOtpEmail("");
-    setOtpToken("");
+    setIsForgotPassword(false);
+    setResetEmailSent(false);
     setErrors({});
     setFormData({ name: "", email: "", password: "", confirmPassword: "" });
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    setErrors({});
-    
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-      
-      if (error) {
-        setErrors({ general: error.message });
-      }
-    } catch (err) {
-      setErrors({ general: 'Failed to connect to Google. Please try again.' });
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
-
-  const handleSendOtp = async () => {
-    if (!otpEmail.trim()) {
-      setErrors({ otpEmail: 'Please enter your email address' });
-      return;
-    }
-    
-    const emailValidation = z.string().email();
-    const result = emailValidation.safeParse(otpEmail.trim());
-    if (!result.success) {
-      setErrors({ otpEmail: 'Please enter a valid email address' });
-      return;
-    }
-
-    setIsOtpLoading(true);
-    setErrors({});
-
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: otpEmail.trim(),
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-
-      if (error) {
-        setErrors({ general: error.message });
-      } else {
-        setIsOtpSent(true);
-      }
-    } catch (err) {
-      setErrors({ general: 'Failed to send OTP. Please try again.' });
-    } finally {
-      setIsOtpLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!otpToken.trim() || otpToken.length !== 6) {
-      setErrors({ otpToken: 'Please enter the 6-digit code' });
-      return;
-    }
-
-    setIsOtpLoading(true);
-    setErrors({});
-
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: otpEmail.trim(),
-        token: otpToken.trim(),
-        type: 'email',
-      });
-
-      if (error) {
-        setErrors({ general: error.message });
-      } else {
-        navigate("/dashboard");
-      }
-    } catch (err) {
-      setErrors({ general: 'Invalid or expired code. Please try again.' });
-    } finally {
-      setIsOtpLoading(false);
-    }
-  };
-
-  const toggleOtpMode = () => {
-    setIsOtpMode(!isOtpMode);
-    setIsOtpSent(false);
-    setOtpEmail("");
-    setOtpToken("");
-    setErrors({});
   };
 
   if (loading) {
@@ -273,15 +219,15 @@ export default function AuthPage() {
               </div>
               <div className="space-y-2">
                 <CardTitle className="text-2xl md:text-3xl">
-                  {isOtpMode 
-                    ? t('auth.loginWithOTP', 'Login with OTP')
+                  {isForgotPassword
+                    ? "Reset Password"
                     : isLogin 
                       ? t('auth.welcomeBack', 'Welcome Back!') 
                       : t('auth.createAccount', 'Create Account')}
                 </CardTitle>
                 <CardDescription className="text-base">
-                  {isOtpMode
-                    ? t('auth.otpDescription', 'We will send a one-time code to your email')
+                  {isForgotPassword
+                    ? "Enter your email to receive a password reset link"
                     : isLogin 
                       ? t('auth.loginDescription', 'Login to explore your career path') 
                       : t('auth.signupDescription', 'Join us to discover your perfect career')}
@@ -290,134 +236,70 @@ export default function AuthPage() {
             </CardHeader>
 
             <CardContent className="pt-4">
-              {/* OTP Mode */}
-              {isOtpMode ? (
+              {isForgotPassword ? (
                 <div className="space-y-4">
-                  {errors.general && (
-                    <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg border border-destructive/20 animate-scale-in">
-                      {errors.general}
+                  {resetEmailSent ? (
+                    <div className="space-y-4 animate-scale-in">
+                      <div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg">
+                        Check your email for the password reset link.
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => {
+                          setIsForgotPassword(false);
+                          setResetEmailSent(false);
+                        }}
+                      >
+                        Back to Login
+                      </Button>
                     </div>
-                  )}
-
-                  {!isOtpSent ? (
-                    <>
+                  ) : (
+                    <form onSubmit={handleForgotPassword} className="space-y-4 animate-slide-up">
+                      {errors.general && (
+                        <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg border border-destructive/20 animate-scale-in">
+                          {errors.general}
+                        </div>
+                      )}
                       <div className="space-y-2">
-                        <Label htmlFor="otpEmail" className="text-sm font-medium">
-                          {t('auth.emailAddress', 'Email Address')}
-                        </Label>
+                        <Label htmlFor="reset-email">Email Address</Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                           <Input
-                            id="otpEmail"
+                            id="reset-email"
                             type="email"
-                            placeholder={t('auth.enterEmail', 'Enter your email')}
-                            value={otpEmail}
-                            onChange={(e) => {
-                              setOtpEmail(e.target.value);
-                              if (errors.otpEmail) setErrors(prev => ({ ...prev, otpEmail: "" }));
-                            }}
-                            className={`pl-11 h-12 text-base ${errors.otpEmail ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                            placeholder="Enter your email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange("email", e.target.value)}
+                            className={`pl-11 h-12 text-base ${errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
                           />
                         </div>
-                        {errors.otpEmail && (
-                          <p className="text-xs text-destructive">{errors.otpEmail}</p>
-                        )}
+                        {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
                       </div>
-
                       <Button 
-                        type="button"
-                        onClick={handleSendOtp}
+                        type="submit" 
                         className="w-full h-12 text-base font-semibold bg-gradient-primary hover:opacity-90 transition-opacity" 
-                        disabled={isOtpLoading}
+                        disabled={isSubmitting}
                       >
-                        {isOtpLoading ? (
+                        {isSubmitting ? (
                           <span className="flex items-center gap-2">
                             <Loader2 className="h-5 w-5 animate-spin" />
                             {t('common.pleaseWait', 'Please wait...')}
                           </span>
                         ) : (
-                          <span className="flex items-center gap-2">
-                            {t('auth.sendOtp', 'Send OTP')}
-                            <ArrowRight className="h-5 w-5" />
-                          </span>
+                          "Send Reset Link"
                         )}
                       </Button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="p-3 text-sm text-primary bg-primary/10 rounded-lg border border-primary/20 animate-scale-in">
-                        {t('auth.otpSentMessage', 'A 6-digit code has been sent to')} <strong>{otpEmail}</strong>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="otpToken" className="text-sm font-medium">
-                          {t('auth.enterOtp', 'Enter OTP Code')}
-                        </Label>
-                        <Input
-                          id="otpToken"
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={6}
-                          placeholder="000000"
-                          value={otpToken}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '');
-                            setOtpToken(value);
-                            if (errors.otpToken) setErrors(prev => ({ ...prev, otpToken: "" }));
-                          }}
-                          className={`h-12 text-center text-2xl tracking-widest font-mono ${errors.otpToken ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                        />
-                        {errors.otpToken && (
-                          <p className="text-xs text-destructive">{errors.otpToken}</p>
-                        )}
-                      </div>
-
                       <Button 
                         type="button"
-                        onClick={handleVerifyOtp}
-                        className="w-full h-12 text-base font-semibold bg-gradient-primary hover:opacity-90 transition-opacity" 
-                        disabled={isOtpLoading}
+                        variant="ghost" 
+                        className="w-full"
+                        onClick={() => setIsForgotPassword(false)}
                       >
-                        {isOtpLoading ? (
-                          <span className="flex items-center gap-2">
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                            {t('auth.verifying', 'Verifying...')}
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            {t('auth.verifyAndLogin', 'Verify & Login')}
-                            <ArrowRight className="h-5 w-5" />
-                          </span>
-                        )}
+                        Back to Login
                       </Button>
-
-                      <Button 
-                        type="button"
-                        variant="ghost"
-                        onClick={() => { setIsOtpSent(false); setOtpToken(""); }}
-                        className="w-full text-sm"
-                      >
-                        {t('auth.resendOtp', 'Resend OTP')}
-                      </Button>
-                    </>
+                    </form>
                   )}
-
-                  <div className="relative my-6">
-                    <Separator />
-                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">
-                      {t('auth.or', 'OR')}
-                    </span>
-                  </div>
-
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={toggleOtpMode}
-                    className="w-full h-12 text-base font-medium"
-                  >
-                    <Lock className="h-5 w-5 mr-2" />
-                    {t('auth.loginWithPassword', 'Login with Password')}
-                  </Button>
                 </div>
               ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -482,6 +364,7 @@ export default function AuthPage() {
                     {isLogin && (
                       <button
                         type="button"
+                        onClick={() => setIsForgotPassword(true)}
                         className="text-xs text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
                       >
                         {t('auth.forgotPassword', 'Forgot Password?')}
@@ -584,54 +467,11 @@ export default function AuthPage() {
                     </span>
                   )}
                 </Button>
-
-                {/* Divider */}
-                <div className="relative my-6">
-                  <Separator />
-                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">
-                    {t('auth.or', 'OR')}
-                  </span>
-                </div>
-
-                {/* Social Login Options */}
-                <div className="space-y-3">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full h-12 text-base font-medium"
-                    onClick={handleGoogleLogin}
-                    disabled={isGoogleLoading || isSubmitting}
-                  >
-                    {isGoogleLoading ? (
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    ) : (
-                      <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                      </svg>
-                    )}
-                    {t('auth.continueWithGoogle', 'Continue with Google')}
-                  </Button>
-
-                  {isLogin && (
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="w-full h-12 text-base font-medium"
-                      onClick={toggleOtpMode}
-                    >
-                      <Mail className="h-5 w-5 mr-2" />
-                      {t('auth.loginWithOTP', 'Login with Email OTP')}
-                    </Button>
-                  )}
-                </div>
-
               </form>
               )}
 
               {/* Switch Mode */}
+              {!isForgotPassword && (
               <div className="mt-6 text-center text-sm">
                 <span className="text-muted-foreground">
                   {isLogin ? t('auth.noAccount', "Don't have an account? ") : t('auth.haveAccount', "Already have an account? ")}
@@ -644,6 +484,7 @@ export default function AuthPage() {
                   {isLogin ? t('auth.signUp', 'Sign Up') : t('auth.login', 'Login')}
                 </button>
               </div>
+              )}
             </CardContent>
           </Card>
 

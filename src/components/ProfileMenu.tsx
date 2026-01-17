@@ -106,14 +106,7 @@ export default function ProfileMenu() {
 
           {/* Secondary actions */}
           <div className="space-y-1">
-            <DropdownMenuItem
-              onClick={() => navigate('/quiz-results')}
-              className={`group flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-all ${location.pathname === '/quiz-results' ? 'bg-primary/5 text-primary' : 'hover:bg-muted/50'}`}
-            >
-              <FileText className={`h-4 w-4 ${location.pathname === '/quiz-results' ? 'text-primary' : 'text-muted-foreground'} transition-colors`} />
-              <span className="flex-1">{t('profile.quizResults', 'Career Quiz Results')}</span>
-            </DropdownMenuItem>
-
+            
             <DropdownMenuItem
               onClick={() => navigate('/notifications')}
               className={`group flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-all ${location.pathname === '/notifications' ? 'bg-primary/5 text-primary' : 'hover:bg-muted/50'}`}
@@ -170,7 +163,10 @@ export default function ProfileMenu() {
           <div className="my-2 border-t" />
 
           <DropdownMenuItem
-            onClick={() => signOut()}
+            onClick={async () => {
+              await signOut();
+              window.location.href = '/';
+            }}
             className="group flex items-center gap-3 px-3 py-2 text-sm rounded-md text-destructive hover:bg-destructive/10 transition-all"
           >
             <LogOut className="h-4 w-4 text-destructive" />

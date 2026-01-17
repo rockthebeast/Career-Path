@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, X, GraduationCap, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ const navLinkKeys = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
 
@@ -93,7 +94,7 @@ export function Header() {
             ))}
             {user && (
               <div className="pt-4 mt-2 border-t">
-                <Button variant="outline" className="w-full" onClick={() => { signOut(); setIsMenuOpen(false); }}>
+                <Button variant="outline" className="w-full" onClick={async () => { await signOut(); setIsMenuOpen(false); navigate('/auth'); }}>
                   <LogOut className="h-4 w-4 mr-2" />
                   {t('common.logout', 'Logout')}
                 </Button>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 type BackButtonProps = {
@@ -10,9 +10,20 @@ type BackButtonProps = {
 
 export const BackButton: React.FC<BackButtonProps> = ({ onClick, label = 'Back', className = '' }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const handle = () => {
     if (onClick) return onClick();
-    navigate(-1);
+
+    // Public routes: fall back to browser back behavior
+    const publicRoutes = ['/', '/auth/callback'];
+    if (publicRoutes.includes(location.pathname)) {
+      navigate(-1);
+      return;
+    }
+
+    // Default: go to dashboard for authenticated sub-pages
+    navigate('/dashboard');
   };
 
   return (

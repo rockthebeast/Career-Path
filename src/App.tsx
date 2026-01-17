@@ -20,12 +20,6 @@ import FavoritesHub from "./pages/FavoritesHub";
 import FavoriteCareersPage from "./pages/FavoriteCareersPage";
 import FavoriteCoursesPage from "./pages/FavoriteCoursesPage";
 import ContactPage from "./pages/ContactPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminCareers from "./pages/admin/AdminCareers";
-import AdminScholarships from "./pages/admin/AdminScholarships";
-import AdminFeedback from "./pages/admin/AdminFeedback";
-import AdminContact from "./pages/admin/AdminContact";
-import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import ParentDashboardPage from "./pages/ParentDashboardPage";
 import CollegeFinderPage from "./pages/CollegeFinderPage";
 import CollegeDetailPage from "./pages/CollegeDetailPage";
@@ -36,6 +30,21 @@ import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 import QuizResultsPage from "./pages/QuizResultsPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import AuthCallback from "./pages/AuthCallback";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "react-router-dom";
+import type { ReactNode } from "react";
+
+function AuthGate({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  if (loading) return null;
+  // Hide ChatBot on public routes and when no user
+  const publicRoutes = ["/", "/auth/callback"];
+  if (publicRoutes.includes(location.pathname)) return null;
+  if (!user) return null;
+  return <>{children}</>;
+}
 
 const queryClient = new QueryClient();
 
@@ -51,6 +60,9 @@ const App = () => (
               {/* Public Route - Login Page */}
               <Route path="/" element={<AuthPage />} />
               
+              {/* OAuth Callback - public route to complete provider login */}
+              <Route path="/auth/callback" element={<AuthCallback />} />
+
               {/* Protected Routes */}
               <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/careers" element={<ProtectedRoute><CareersPage /></ProtectedRoute>} />
@@ -75,17 +87,14 @@ const App = () => (
               <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               
-              {/* Admin Routes */}
-              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/careers" element={<ProtectedRoute><AdminCareers /></ProtectedRoute>} />
-              <Route path="/admin/scholarships" element={<ProtectedRoute><AdminScholarships /></ProtectedRoute>} />
-              <Route path="/admin/feedback" element={<ProtectedRoute><AdminFeedback /></ProtectedRoute>} />
-              <Route path="/admin/contact" element={<ProtectedRoute><AdminContact /></ProtectedRoute>} />
-              <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
-              
+                                                                                                                
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <ChatBot />
+            {/* Only show ChatBot after login (i.e., not on the public Auth page) */}
+            {/* We conditionally render ChatBot by checking current route and auth state via a lightweight wrapper */}
+            <AuthGate>
+              <ChatBot />
+            </AuthGate>
             <ExitIntentFeedback />
           </AuthProvider>
         </BrowserRouter>

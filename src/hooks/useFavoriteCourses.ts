@@ -44,9 +44,18 @@ export function useFavoriteCourses() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setFavorites(data || []);
+      
+      const validData = data || [];
+      setFavorites(validData);
+      // Cache to localStorage
+      localStorage.setItem(`favorites_courses_${user.id}`, JSON.stringify(validData));
     } catch (error) {
       console.error("Error fetching favorites:", error);
+      // Fallback to localStorage
+      const cached = localStorage.getItem(`favorites_courses_${user.id}`);
+      if (cached) {
+        setFavorites(JSON.parse(cached));
+      }
     } finally {
       setLoading(false);
     }
@@ -62,7 +71,7 @@ export function useFavoriteCourses() {
 
   const toggleFavorite = async (course: CourseData) => {
     if (!user) {
-      toast({
+      toast({ 
         title: "Login Required",
         description: "Please login to save favorite courses.",
         variant: "destructive",
@@ -72,9 +81,29 @@ export function useFavoriteCourses() {
 
     const isCurrentlyFavorite = isFavorite(course.id);
 
+    // Optimistic update
+    const previousFavorites = [...favorites];
+    let newFavorites: FavoriteCourse[] = [];
+
+    if (isCurrentlyFavorite) {
+      newFavorites = previousFavorites.filter((fav) => fav.course_id !== course.id);
+    } else {
+      const optimisticFavorite: FavoriteCourse = {
+        id: `temp-${Date.now()}`,
+        course_id: course.id,
+        course_name: course.title,
+        course_platform: course.platformName,
+        course_description: course.description,
+        course_url: course.link,
+        course_category: course.category,
+        created_at: new Date().toISOString(),
+      };
+      newFavorites = [optimisticFavorite, ...previousFavorites];
+    }
+    setFavorites(newFavorites);
+
     try {
       if (isCurrentlyFavorite) {
-        // Remove from favorites
         const { error } = await supabase
           .from("favorite_courses")
           .delete()
@@ -82,14 +111,15 @@ export function useFavoriteCourses() {
           .eq("course_id", course.id);
 
         if (error) throw error;
+        
+        // Sync to localStorage
+        localStorage.setItem(`favorites_courses_${user.id}`, JSON.stringify(newFavorites));
 
-        setFavorites(prev => prev.filter(fav => fav.course_id !== course.id));
         toast({
           title: "Removed from Favorites",
-          description: `${course.title} has been removed from your favorites.`,
+          description: "Course has been removed from your favorites.",
         });
       } else {
-        // Add to favorites
         const { data, error } = await supabase
           .from("favorite_courses")
           .insert({
@@ -106,24 +136,46 @@ export function useFavoriteCourses() {
 
         if (error) throw error;
 
-        setFavorites(prev => [data, ...prev]);
+        // Replace optimistic entry with real data
+        if (data) {
+          setFavorites((prev) => prev.map((f) => (f.course_id === course.id ? data : f)));
+          // Update localStorage with real data
+          const updatedFavs = newFavorites.map((f) => (f.course_id === course.id ? data : f));
+          localStorage.setItem(`favorites_courses_${user.id}`, JSON.stringify(updatedFavs));
+        }
+
         toast({
           title: "Added to Favorites",
-          description: `${course.title} has been added to your favorites.`,
+          description: "Course has been added to your favorites.",
         });
       }
     } catch (error) {
-      console.error("Error toggling favorite:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update favorites. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Error toggling favorite course:", error);
+      
+      // Fallback: Save to localStorage if API fails
+      try {
+        localStorage.setItem(`favorites_courses_${user.id}`, JSON.stringify(newFavorites));
+        toast({
+          title: isCurrentlyFavorite ? "Removed from Favorites" : "Added to Favorites",
+          description: isCurrentlyFavorite ? "Course removed from favorites." : "Course added to favorites.",
+        });
+      } catch (localError) {
+        setFavorites(previousFavorites); // Revert only if local save also fails
+        toast({
+          title: "Failed to save favorite",
+          description: "Unable to save changes. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const removeFavorite = async (courseId: string) => {
     if (!user) return;
+
+    const previousFavorites = [...favorites];
+    const newFavorites = previousFavorites.filter((fav) => fav.course_id !== courseId);
+    setFavorites(newFavorites);
 
     try {
       const { error } = await supabase
@@ -133,19 +185,31 @@ export function useFavoriteCourses() {
         .eq("course_id", courseId);
 
       if (error) throw error;
-
-      setFavorites(prev => prev.filter(fav => fav.course_id !== courseId));
+      
+      localStorage.setItem(`favorites_courses_${user.id}`, JSON.stringify(newFavorites));
+      
       toast({
         title: "Removed from Favorites",
         description: "Course has been removed from your favorites.",
       });
     } catch (error) {
-      console.error("Error removing favorite:", error);
-      toast({
-        title: "Error",
-        description: "Failed to remove from favorites. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Error removing favorite course:", error);
+      
+      // Fallback
+      try {
+        localStorage.setItem(`favorites_courses_${user.id}`, JSON.stringify(newFavorites));
+        toast({
+          title: "Removed from Favorites",
+          description: "Course has been removed from your favorites.",
+        });
+      } catch (localError) {
+        setFavorites(previousFavorites);
+        toast({
+          title: "Failed to remove favorite",
+          description: "Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -155,6 +219,5 @@ export function useFavoriteCourses() {
     isFavorite,
     toggleFavorite,
     removeFavorite,
-    refetch: fetchFavorites,
   };
 }

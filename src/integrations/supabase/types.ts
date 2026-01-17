@@ -61,6 +61,7 @@ export type Database = {
           title: string
           updated_at: string
           views: number | null
+          user_id: string | null
         }
         Insert: {
           category?: string | null
@@ -75,6 +76,7 @@ export type Database = {
           title: string
           updated_at?: string
           views?: number | null
+          user_id?: string | null
         }
         Update: {
           category?: string | null
@@ -89,6 +91,7 @@ export type Database = {
           title?: string
           updated_at?: string
           views?: number | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -130,6 +133,7 @@ export type Database = {
           created_at: string
           id: string
           user_id: string
+          user_email: string | null
         }
         Insert: {
           career_category?: string | null
@@ -141,6 +145,7 @@ export type Database = {
           created_at?: string
           id?: string
           user_id: string
+          user_email?: string | null
         }
         Update: {
           career_category?: string | null
@@ -152,6 +157,7 @@ export type Database = {
           created_at?: string
           id?: string
           user_id?: string
+          user_email?: string | null
         }
         Relationships: []
       }
@@ -166,6 +172,7 @@ export type Database = {
           created_at: string
           id: string
           user_id: string
+          user_email: string | null
         }
         Insert: {
           course_category?: string | null
@@ -177,6 +184,7 @@ export type Database = {
           created_at?: string
           id?: string
           user_id: string
+          user_email?: string | null
         }
         Update: {
           course_category?: string | null
@@ -188,6 +196,7 @@ export type Database = {
           created_at?: string
           id?: string
           user_id?: string
+          user_email?: string | null
         }
         Relationships: []
       }
@@ -373,6 +382,27 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_logins: {
+        Row: {
+          id: string
+          user_id: string
+          email: string
+          login_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          email: string
+          login_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          email?: string
+          login_at?: string
         }
         Relationships: []
       }

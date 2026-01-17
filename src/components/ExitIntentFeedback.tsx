@@ -36,16 +36,44 @@ export function ExitIntentFeedback() {
   useEffect(() => {
     if (hasShownThisSession()) return;
 
-    const handleMouseLeave = (e: MouseEvent) => {
-      // Only trigger when mouse moves toward top of viewport (exit intent)
-      if (e.clientY <= 0 && !hasShownThisSession()) {
-        setOpen(true);
-        markAsShown();
-      }
-    };
+    // Delay enabling listeners to prevent triggering on page load or right after login
+    const timeoutId = setTimeout(() => {
+      const handleMouseLeave = (e: MouseEvent) => {
+        // Only trigger when mouse moves toward top of viewport (exit intent)
+        if (e.clientY <= 0 && !hasShownThisSession()) {
+          setOpen(true);
+          markAsShown();
+        }
+      };
 
-    document.addEventListener('mouseleave', handleMouseLeave);
-    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+      const handleVisibilityChange = () => {
+        // Trigger on tab switch (when page becomes hidden)
+        if (document.hidden && !hasShownThisSession()) {
+          setOpen(true);
+          markAsShown();
+        }
+      };
+
+      const handleBeforeUnload = () => {
+        // Trigger on close or back navigation
+        if (!hasShownThisSession()) {
+          setOpen(true);
+          markAsShown();
+        }
+      };
+
+      document.addEventListener('mouseleave', handleMouseLeave);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('beforeunload', handleBeforeUnload);
+
+      return () => {
+        document.removeEventListener('mouseleave', handleMouseLeave);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }, 5000); // 5-second delay
+
+    return () => clearTimeout(timeoutId);
   }, [hasShownThisSession, markAsShown]);
 
   const handleSubmit = () => {

@@ -100,6 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    // Clear all localStorage to ensure complete logout
+    localStorage.clear();
+    // Clear sessionStorage as well
+    sessionStorage.clear();
     toast({
       title: "Logged Out",
       description: "You have been successfully logged out.",

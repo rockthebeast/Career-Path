@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useFavoriteCareers } from "@/hooks/useFavoriteCareers";
-import { useToast } from "@/hooks/use-toast";
 import { careerSkillsData, defaultSkills, CareerSkillCategory } from "@/data/careerSkillsData";
 import { RelatedOpportunities } from "@/components/RelatedOpportunities";
 
@@ -490,7 +489,6 @@ export default function CareerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavoriteCareers();
-  const { toast } = useToast();
 
   const career = careers.find((c) => c.id === id);
 
@@ -512,28 +510,14 @@ export default function CareerDetailPage() {
   const IconComponent = career.icon;
 
   const handleFavoriteToggle = async () => {
-    try {
-      await toggleFavorite({
-        id: career.id,
-        title: career.title,
-        description: career.description,
-        category: career.category,
-        salary: career.salary,
-        skills: career.skills,
-      });
-      toast({
-        title: isFavorite(career.id) ? "Removed from favorites" : "Added to favorites",
-        description: isFavorite(career.id)
-          ? `${career.title} has been removed from your favorites.`
-          : `${career.title} has been added to your favorites.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Login Required",
-        description: "Please login to save favorites.",
-        variant: "destructive",
-      });
-    }
+    await toggleFavorite({
+      id: career.id,
+      title: career.title,
+      description: career.description,
+      category: career.category,
+      salary: career.salary,
+      skills: career.skills,
+    });
   };
 
   return (

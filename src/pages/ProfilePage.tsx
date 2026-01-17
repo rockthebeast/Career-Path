@@ -23,7 +23,6 @@ export default function ProfilePage() {
   const [education, setEducation] = useState<string>(meta.education ?? '');
   const [stream, setStream] = useState<string>(meta.stream ?? '');
   const [interests, setInterests] = useState<string>((meta.interests ?? []).join?.(', ') ?? (meta.interests ?? ''));
-  const [language, setLanguage] = useState<string>(i18n.language || 'en');
   const [avatarPreview, setAvatarPreview] = useState<string | null>((meta.avatar_url as string) ?? null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
@@ -50,7 +49,7 @@ export default function ProfilePage() {
         education,
         stream,
         interests: interests.split(',').map(s => s.trim()).filter(Boolean),
-        language,
+        language: i18n.language,
       };
 
       if (avatarPreview) {
@@ -64,7 +63,6 @@ export default function ProfilePage() {
       // Optionally update profiles table if present
       await supabase.from('profiles').upsert({ user_id: user?.id, email, name });
 
-      i18n.changeLanguage(language);
       toast({ title: t('profile.saved', 'Profile saved'), description: t('profile.savedDesc', 'Your profile was updated successfully.') });
     } catch (err: any) {
       toast({ title: t('profile.saveFailed', 'Save failed'), description: err.message || String(err), variant: 'destructive' });
@@ -152,6 +150,7 @@ export default function ProfilePage() {
                     <select className="w-full rounded-md border p-2 mt-1" value={education} onChange={(e) => setEducation(e.target.value)}>
                       <option value="">--</option>
                       <option value="highschool">{t('education.highschool','High School')}</option>
+                      <option value="puc">{t('education.puc','PUC / Class 11–12')}</option>
                       <option value="bachelors">{t('education.bachelors','Bachelors')}</option>
                       <option value="masters">{t('education.masters','Masters')}</option>
                       <option value="other">{t('education.other','Other')}</option>
@@ -170,7 +169,7 @@ export default function ProfilePage() {
 
                   <div>
                     <Label className="flex items-center gap-2">{t('profile.language', 'Language')}</Label>
-                    <select className="w-full rounded-md border p-2 mt-1" value={language} onChange={(e) => setLanguage(e.target.value)}>
+                    <select className="w-full rounded-md border p-2 mt-1" value={i18n.language} onChange={(e) => i18n.changeLanguage(e.target.value)}>
                       <option value="en">English</option>
                       <option value="hi">हिंदी</option>
                       <option value="kn">ಕನ್ನಡ</option>
@@ -182,14 +181,14 @@ export default function ProfilePage() {
                   <Button onClick={saveProfile} disabled={saving}>
                     <Save className="h-4 w-4 mr-2" /> {saving ? t('common.saving','Saving...') : t('profile.save','Save changes')}
                   </Button>
-                  <Button variant="ghost" onClick={() => { setName(meta.name ?? ''); setEducation(meta.education ?? ''); setStream(meta.stream ?? ''); setInterests((meta.interests ?? []).join?.(', ') ?? ''); setLanguage(i18n.language || 'en'); setAvatarPreview((meta.avatar_url as string) ?? null); }}>
+                  <Button variant="ghost" onClick={() => { setName(meta.name ?? ''); setEducation(meta.education ?? ''); setStream(meta.stream ?? ''); setInterests((meta.interests ?? []).join?.(', ') ?? ''); i18n.changeLanguage(meta.language || 'en'); setAvatarPreview((meta.avatar_url as string) ?? null); }}>
                     <X className="h-4 w-4 mr-2" /> {t('common.cancel','Cancel')}
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="mb-6">
               <CardHeader>
                 <CardTitle className="text-lg">{t('profile.sectionSecurity','Security')}</CardTitle>
               </CardHeader>
